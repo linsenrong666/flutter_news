@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news/pages/welcome/welcome.dart';
+import 'package:flutter_news/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
           home: child,
+          routes: staticRoutes,
         );
       },
       child: const WelcomePage(),

@@ -12,7 +12,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Center(
       child: Column(
         children: [
@@ -34,13 +34,13 @@ class _WelcomePageState extends State<WelcomePage> {
             20.h,
           ),
           const Spacer(),
-          _buildButton(),
+          _buildButton(context),
         ],
       ),
     );
   }
 
-  Widget _buildButton() {
+  Widget _buildButton(BuildContext context) {
     return Container(
       width: 295.w,
       height: 44.h,
@@ -52,7 +52,12 @@ class _WelcomePageState extends State<WelcomePage> {
         shape: const RoundedRectangleBorder(
           borderRadius: Radii.k6pxRadius,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            "/sign-in",
+          );
+        },
       ),
     );
   }
@@ -130,7 +135,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 }
