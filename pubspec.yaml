@@ -22,6 +22,17 @@ dependencies:
   # toast
   fluttertoast: ^8.0.9
 
+  #http
+  dio: ^4.0.6
+  cookie_jar: ^3.0.1
+  dio_cookie_manager: ^2.0.0
+
+  # storage
+  localstorage: ^4.0.0+1
+
+  # sha
+  crypto: ^3.0.2
+
 dev_dependencies:
 
   flutter_test:

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news/common/widgets/buttons.dart';
+import 'package:flutter_news/common/apis/api.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../common/entities/entities.dart';
+import '../../common/utils/utils.dart';
 import '../../common/values/values.dart';
-import '../../common/widgets/icons.dart';
-import '../../common/widgets/input_text_edit.dart';
+import '../../common/widgets/widgets.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  _handleSignIn() async {
+  void _handleSignIn() async {
     // if (!duIsEmail(_emailController.value.text)) {
     //   toastInfo(msg: '请正确输入邮件');
     //   return;
@@ -39,12 +40,15 @@ class _SignInPageState extends State<SignInPage> {
     //   return;
     // }
 
-    // UserLoginRequestEntity params = UserLoginRequestEntity(
-    //   email: _emailController.value.text,
-    //   password: duSHA256(_passController.value.text),
-    // );
+    UserLoginRequestEntity params = UserLoginRequestEntity(
+      username: _emailController.value.text,
+      password: duSHA256(_passController.value.text),
+    );
 
-    // UserLoginResponseEntity userProfile = await UserAPI.login(params: params);
+    UserLoginResponseEntity res = await UserApi.login(params: params);
+
+    toastInfo(msg: res.accessToken);
+
     // Global.saveProfile(userProfile);
 
     // List<NewsIndexResponseEntity> newsList = await NewsAPI.index();
@@ -55,7 +59,6 @@ class _SignInPageState extends State<SignInPage> {
     //   "/app",
     // );
   }
-
 
   Widget _buildLogo() {
     return Container(
@@ -131,7 +134,9 @@ class _SignInPageState extends State<SignInPage> {
           const Spacer(),
           flatStyleButton(
             text: 'SignIn',
-            onPressed: () {},
+            onPressed: () {
+              _handleSignIn();
+            },
           ),
         ],
       ),
