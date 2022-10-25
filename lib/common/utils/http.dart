@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_news/common/utils/net_cache.dart';
 import 'package:flutter_news/common/utils/storage.dart';
+import 'package:flutter_news/common/utils/utils.dart';
 
+import '../../global.dart';
 import '../values/values.dart';
 
 /// http 请求工具
@@ -60,8 +66,9 @@ class Http {
         RequestOptions options,
         RequestInterceptorHandler handler,
       ) {
-        print("请求 --> " + options.baseUrl + options.path);
-        print("请求 --> ${options.queryParameters}");
+        LogUtils.d("请求 --> " + options.baseUrl + options.path);
+        LogUtils.d("请求参数 --> ${options.queryParameters}");
+        LogUtils.d("请求data --> ${options.data.toString()}");
         return handler.next(options);
       },
       //
@@ -69,18 +76,33 @@ class Http {
         Response response,
         ResponseInterceptorHandler handler,
       ) {
-        print("响应 --> " + response.toString());
-        handler.next(response);
+        LogUtils.d("响应 --> " + response.toString());
+        return handler.next(response);
       },
       //
       onError: (
         DioError e,
         ErrorInterceptorHandler handler,
       ) {
-        print("错误 -->" + e.toString());
+        LogUtils.d("错误 -->" + e.toString());
         return handler.next(e);
       },
     ));
+
+    dio.interceptors.add(NetCache());
+
+    // 在调试模式下需要抓包调试，所以我们使用代理，并禁用HTTPS证书校验
+    if (PROXY_ENABLE) {
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        client.findProxy = (uri) {
+          return "PROXY $PROXY_IP:$PROXY_PORT";
+        };
+        //代理工具会提供一个抓包的自签名证书，会通不过证书校验，所以我们禁用证书校验
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+      };
+    }
   }
 
   // 错误信息
@@ -142,23 +164,50 @@ class Http {
   }
 
   /// 读取本地配置
-  Options getLocalOptions() {
-    Options options;
-    String token = StorageUtils().getItem(STORAGE_USER_TOKEN_KEY);
-    options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    return options;
+  Map<String, dynamic> getAuthorizationHeader() {
+    var headers;
+    String accessToken = Global.profile.accessToken;
+    if (accessToken != null) {
+      headers = {
+        'Authorization': 'Bearer $accessToken',
+      };
+    }
+    return headers;
   }
 
   /// restful get 操作
-  Future get(String path,
-      {dynamic params, Options? options, CancelToken? cancelToken}) async {
+  /// refresh 是否下拉刷新 默认 false
+  /// noCache 是否不缓存 默认 true
+  /// list 是否列表 默认 false
+  /// cacheKey 缓存key
+  /// cacheDisk 是否磁盘缓存
+  Future get(
+    String path, {
+    dynamic params,
+    Options? options,
+    bool refresh = false,
+    bool noCache = !CACHE_ENABLE,
+    bool list = false,
+    String? cacheKey,
+    bool cacheDisk = false,
+  }) async {
     try {
-      var tokenOptions = options ?? getLocalOptions();
+      Options requestOptions = options ?? Options();
+      requestOptions = requestOptions.copyWith(extra: {
+        "refresh": refresh,
+        "noCache": noCache,
+        "list": list,
+        "cacheKey": cacheKey,
+        "cacheDisk": cacheDisk,
+      });
+      Map<String, dynamic> _authorization = getAuthorizationHeader();
+      if (_authorization != null) {
+        requestOptions = requestOptions.copyWith(headers: _authorization);
+      }
+
       var response = await dio.get(path,
           queryParameters: params,
-          options: tokenOptions,
+          options: requestOptions,
           cancelToken: cancelToken);
       return response.data;
     } on DioError catch (e) {
@@ -167,16 +216,18 @@ class Http {
   }
 
   /// restful post 操作
-  Future post(String path,
-      {dynamic params, Options? options, CancelToken? cancelToken}) async {
-    try {
-      var tokenOptions = options ?? getLocalOptions();
-      var response = await dio.post(path,
-          data: params, options: tokenOptions, cancelToken: cancelToken);
-      return response.data;
-    } on DioError catch (e) {
-      throw createErrorEntity(e);
-    }
+  Future post(
+    String path, {
+    dynamic params,
+    Options? options,
+  }) async {
+    Options requestOptions = options ?? Options();
+    Map<String, dynamic> _authorization = getAuthorizationHeader();
+    requestOptions = requestOptions.copyWith(headers: _authorization);
+
+    var response = await dio.post(path,
+        data: params, options: requestOptions, cancelToken: cancelToken);
+    return response.data;
   }
 }
 

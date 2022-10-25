@@ -6,6 +6,7 @@ import '../../common/entities/entities.dart';
 import '../../common/utils/utils.dart';
 import '../../common/values/values.dart';
 import '../../common/widgets/widgets.dart';
+import '../../global.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -41,23 +42,23 @@ class _SignInPageState extends State<SignInPage> {
     // }
 
     UserLoginRequestEntity params = UserLoginRequestEntity(
-      username: _emailController.value.text,
+      email: _emailController.value.text,
       password: duSHA256(_passController.value.text),
     );
 
     UserLoginResponseEntity res = await UserApi.login(params: params);
 
-    toastInfo(msg: res.accessToken);
+    // toastInfo(msg: res.accessToken);
 
-    // Global.saveProfile(userProfile);
+    Global.saveProfile(res);
 
     // List<NewsIndexResponseEntity> newsList = await NewsAPI.index();
     // print(newsList.length);
 
-    // Navigator.pushNamed(
-    //   context,
-    //   "/app",
-    // );
+    Navigator.pushNamed(
+      context,
+      "/app-main",
+    );
   }
 
   Widget _buildLogo() {

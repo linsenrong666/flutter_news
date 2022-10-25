@@ -1,23 +1,23 @@
-// 登录请求
-import 'package:flutter_news/main.dart';
+import 'package:flutter/foundation.dart';
 
+// 登录请求
 class UserLoginRequestEntity {
-  final String username;
-  final String password;
+  String email;
+  String password;
 
   UserLoginRequestEntity({
-    required this.username,
+    required this.email,
     required this.password,
   });
 
   factory UserLoginRequestEntity.fromJson(Map<String, dynamic> json) =>
       UserLoginRequestEntity(
-        username: json["username"],
+        email: json["email"],
         password: json["password"],
       );
 
   Map<String, dynamic> toJson() => {
-        "username": username,
+        "email": email,
         "password": password,
       };
 }
@@ -25,35 +25,25 @@ class UserLoginRequestEntity {
 // 登录返回
 class UserLoginResponseEntity {
   String accessToken;
-  String? displayName;
-  List<String>? channels;
+  String displayName;
+  List<String> channels;
 
   UserLoginResponseEntity({
     required this.accessToken,
-    this.displayName,
-    this.channels,
+    required this.displayName,
+    required this.channels,
   });
 
-  factory UserLoginResponseEntity.fromJson(Map<String, dynamic> json) {
-    List<String> channels = [];
+  factory UserLoginResponseEntity.fromJson(Map<String, dynamic> json) =>
+      UserLoginResponseEntity(
+        accessToken: json["access_token"],
+        displayName: json["display_name"],
+        channels: List<String>.from(json["channels"].map((x) => x)),
+      );
 
-    if (json.containsKey("channels")) {
-      channels = List<String>.from(json["channels"].map((x) => x));
-    }
-
-    return UserLoginResponseEntity(
-      accessToken: json["accessToken"],
-      displayName: json["displayName"],
-      channels: channels,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = {};
-    map.putIfAbsent('accessToken', () => accessToken);
-    if (displayName != null) {
-      map.putIfAbsent('displayName', () => displayName);
-    }
-    return map;
-  }
+  Map<String, dynamic> toJson() => {
+        "access_token": accessToken,
+        "display_name": displayName,
+        "channels": List<dynamic>.from(channels.map((x) => x)),
+      };
 }

@@ -3,7 +3,12 @@ import 'package:flutter_news/pages/welcome/welcome.dart';
 import 'package:flutter_news/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-void main() {
+import 'global.dart';
+
+void main() async {
+
+  await Global.init();
+
   runApp(const MyApp());
 }
 
