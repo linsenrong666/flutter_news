@@ -5,3 +5,4 @@ export 'buttons.dart';
 export 'input_text_edit.dart';
 export 'toast.dart';
 export 'icons.dart';
+export 'image.dart';

@@ -29,12 +29,16 @@ dependencies:
 
   # storage
   shared_preferences: ^2.0.15
+  cached_network_image: ^3.2.0
 
   # sha
   crypto: ^3.0.2
 
   # ui
   flutter_easyrefresh: ^2.2.2
+
+  # 日期格式
+  intl: ^0.17.0
 
 dev_dependencies:
 

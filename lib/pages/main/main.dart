@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_news/pages/main/categories_widget.dart';
+import 'package:flutter_news/pages/main/news_item_widget.dart';
+import 'package:flutter_news/pages/main/recommend_widget.dart';
 
 import '../../common/apis/api.dart';
 import '../../common/entities/entities.dart';
+import '../../common/utils/utils.dart';
+import '../../common/widgets/channels_widget.dart';
+import 'newsletter_widget.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -94,23 +99,47 @@ class _MainPageState extends State<MainPage> {
 
   // 推荐阅读
   Widget _buildRecommend() {
-    return Container();
+    return _newsRecommend == null // 数据没到位，可以用骨架图展示
+        ? Container()
+        : recommendWidget(_newsRecommend);
   }
 
   // 频道
   Widget _buildChannels() {
-    return Container();
+    if (_channels == null) {
+      return Container();
+    } else {
+      return newsChannelsWidget(
+        channels: _channels!,
+        onTap: (ChannelResponseEntity item) {},
+      );
+    }
   }
 
   // 新闻列表
   Widget _buildNewsList() {
-    return Container();
+    if (_newsPageList == null || _newsPageList?.items == null) {
+      return Container(
+        height: duSetHeight(161 * 5 + 100.0),
+      );
+    } else {
+      return Column(
+        children: _newsPageList!.items!.map((item) {
+          return Column(
+            children: <Widget>[
+              newsItem(item),
+              const Divider(height: 1),
+            ],
+          );
+        }).toList(),
+      );
+    }
   }
 
   // ad 广告条
   // 邮件订阅
   Widget _buildEmailSubscribe() {
-    return Container();
+    return newsletterWidget();
   }
 
   @override
