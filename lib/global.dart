@@ -15,6 +15,12 @@ class Global {
     channels: [],
   );
 
+  /// 是否第一次打开
+  static bool isFirstOpen = false;
+
+
+  static bool isOfflineLogin = false;
+
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
 
@@ -25,10 +31,17 @@ class Global {
 
     Http();
 
+    // 读取设备第一次打开
+    isFirstOpen = !StorageUtils().getBool(STORAGE_DEVICE_ALREADY_OPEN_KEY);
+    if (isFirstOpen) {
+      StorageUtils().setBool(STORAGE_DEVICE_ALREADY_OPEN_KEY, true);
+    }
+
     // 读取离线用户信息
     var _profileJSON = StorageUtils().getJSON(STORAGE_USER_PROFILE_KEY);
     if (_profileJSON != null) {
       profile = UserLoginResponseEntity.fromJson(_profileJSON);
+      isOfflineLogin = true;
     }
 
     // android 状态栏为透明的沉浸

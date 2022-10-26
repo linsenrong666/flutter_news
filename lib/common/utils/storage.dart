@@ -31,4 +31,13 @@ class StorageUtils {
   Future<bool>? remove(String key) {
     return _prefs?.remove(key);
   }
+
+  Future<bool>? setBool(String key, bool val) {
+    return _prefs?.setBool(key, val);
+  }
+
+  bool getBool(String key) {
+    bool? val = _prefs?.getBool(key);
+    return val ?? false;
+  }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news/pages/welcome/welcome.dart';
+import 'package:flutter_news/pages/index/index_page.dart';
 import 'package:flutter_news/routes.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           routes: staticRoutes,
         );
       },
-      child: const WelcomePage(),
+      child: const IndexPage(),
     );
   }
 }
